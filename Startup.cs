@@ -38,7 +38,14 @@ namespace packt_asp_net_core_and_angular2
             loggerFactory.AddDebug();
 
             app.UseDefaultFiles();
-            app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                OnPrepareResponse = context => {
+                    context.Context.Response.Headers["Cache-Control"] = Configuration["StaticFiles:Headers:Cache-Control"];
+                    context.Context.Response.Headers["Pragma"] = Configuration["StaticFiles:Headers:Pragma"];
+                    context.Context.Response.Headers["Expires"]= Configuration["StaticFiles:Headers:Expires"];
+                }
+            });
 
             app.UseMvc();
         }
