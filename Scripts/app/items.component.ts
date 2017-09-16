@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { Item } from "./item";
 import { ItemService } from "./item.service";
 
 @Component({
   selector: "item-list",
   template: `
-    <h2>Latest Item</h2>
+    <h2>{{title}}</h2>
     <ul class="items">
       <li *ngFor="let item of items"
         [class.selected]="item === selectedItem"
@@ -25,6 +25,9 @@ import { ItemService } from "./item.service";
   `]
 })
 export class ItemListComponent implements OnInit {
+  @Input() class: string;
+  title: string;
+
   selectedItem: Item;
   items: Item[];
   errorMessage: string;
@@ -32,12 +35,26 @@ export class ItemListComponent implements OnInit {
   constructor(private itemService: ItemService) { }
 
   ngOnInit() {
-    this.getLatest();
-  }
+    console.log("ItemComponent instantiated with type " + this.class);
 
-  getLatest() {
-    this.itemService.getLatest()
-      .then(items => this.items = items);
+    var promise = null;
+    switch(this.class) {
+      default:
+      case "latest":
+        this.title = "Latest Items";
+        promise = this.itemService.getLatest();
+        break;
+      case "most-viewed":
+        this.title = "Most Viewed Items";
+        promise = this.itemService.getMostViewed();
+        break;
+      case "random":
+        this.title = "Random Items";
+        promise = this.itemService.getRandom();
+        break;
+    }
+
+    promise.then(items => this.items = items);
   }
 
   onSelect(item: Item) {
