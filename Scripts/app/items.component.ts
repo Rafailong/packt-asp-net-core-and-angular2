@@ -13,6 +13,7 @@ import { ItemService } from "./item.service";
           <span>{{item.Title}}</span>
         </li>
     </ul>
+    <item-detail *ngIf="selectedItem" [item]="selectedItem"></item-detail>
   `,
   styles: [`
     ul.items li {
@@ -39,7 +40,7 @@ export class ItemListComponent implements OnInit {
       .then(items => this.items = items);
   }
 
-  onSelected(item: Item) {
+  onSelect(item: Item) {
     this.selectedItem = item;
     console.log("Item with Id " + this.selectedItem.Id + "has been selected");
   }
