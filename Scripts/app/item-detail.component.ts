@@ -1,5 +1,8 @@
-import { Component, Input } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
+import { Router, ActivatedRoute } from '@angular/router';
+
 import { Item } from "./item";
+import { ItemService } from './item.service';
 
 @Component({
   selector: "item-detail",
@@ -34,6 +37,22 @@ import { Item } from "./item";
     }
   `]
 })
-export class ItemDetailComponent {
-  @Input("item") item: Item;
+export class ItemDetailComponent implements OnInit {
+  item: Item;
+
+  constructor(
+    private router: Router,
+    private itemService: ItemService,
+    private activatedRoute: ActivatedRoute
+  ) {}
+
+  ngOnInit() {
+    var id = this.activatedRoute.snapshot.params['id'];
+    if (id) {
+      this.itemService.get(id)
+        .then(item => this.item = item);
+    } else {
+      this.router.navigate(['']);
+    }
+  }
 }

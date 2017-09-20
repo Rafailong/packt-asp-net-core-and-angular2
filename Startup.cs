@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Rewrite;
 
 namespace packt_asp_net_core_and_angular2
 {
@@ -36,6 +37,10 @@ namespace packt_asp_net_core_and_angular2
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
+
+            var options = new RewriteOptions()
+                .AddIISUrlRewrite(env.ContentRootFileProvider, "IISUrlRewrite.xml");
+            app.UseRewriter(options);
 
             app.UseDefaultFiles();
             app.UseStaticFiles(new StaticFileOptions
