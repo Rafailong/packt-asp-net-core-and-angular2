@@ -8,6 +8,7 @@ using packt_asp_net_core_and_angular2.ViewModels;
 using Newtonsoft.Json;
 using packt_asp_net_core_and_angular2.Data;
 using AutoMapper;
+using packt_asp_net_core_and_angular2.Data.Items;
 
 namespace packt_asp_net_core_and_angular2.Controllers
 {
@@ -105,24 +106,65 @@ namespace packt_asp_net_core_and_angular2.Controllers
             return new JsonResult(arr, DefaultJonSerializerSetting);
         }
 
-        private IList<ItemViewModel> GetSampleItem(int n = 999)
+        [HttpPost]
+        public IActionResult Add([FromBody] ItemViewModel model)
         {
-            var arr = new List<ItemViewModel>();
-            var date = new DateTime(2016, 12, 31).AddDays(-n);
-            for (int i = 0; i < n; i++)
+            if (!ModelState.IsValid || model == null)
             {
-                arr.Add(new ItemViewModel
-                {
-                    Id = i,
-                    Title = $"Item {i} Title",
-                    Description = $"This is a sample description for {i}. Lorem ipsum dolor sit amet.",
-                    CreatedDate = date.AddDays(i),
-                    LastModifiedDate = date.AddDays(i),
-                    ViewCount = n - i
-                });
+                return BadRequest();
             }
-            
-            return arr;
+
+            var item = this._mapper.Map<Item>(model);
+            item.CreatedDate =
+            item.LastModifiedDate = DateTime.Now;
+
+            item.UserId = this._dbContext.Users.First(u => u.UserName == "Admin").Id;
+            this._dbContext.Items.Add(item);
+            this._dbContext.SaveChanges();
+
+            return new JsonResult(this._mapper.Map<ItemViewModel>(item), this.DefaultJonSerializerSetting);
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult Edit(int id, [FromBody] ItemViewModel model)
+        {
+            if (!ModelState.IsValid || model == null)
+            {
+                return BadRequest();
+            }
+
+            var item = this._dbContext.Items.Find(id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+
+            item.UserId = model.UserId;
+            item.Description = model.Description;
+            item.Flags = model.Flags;
+            item.Notes = model.Notes;
+            item.Text = model.Text;
+            item.Title = model.Title;
+            item.Type = model.Type;
+            item.LastModifiedDate = DateTime.Now;
+
+            this._dbContext.SaveChanges();
+
+            return new JsonResult(this._mapper.Map<ItemViewModel>(item), this.DefaultJonSerializerSetting);
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            var item = this._dbContext.Items.Find(id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+
+            this._dbContext.Items.Remove(item);
+            this._dbContext.SaveChanges();
+            return Ok();
         }
     }
 }
