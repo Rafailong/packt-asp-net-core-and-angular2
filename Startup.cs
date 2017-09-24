@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Rewrite;
 using packt_asp_net_core_and_angular2.Data;
 
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 
 namespace packt_asp_net_core_and_angular2
 {
@@ -34,6 +35,14 @@ namespace packt_asp_net_core_and_angular2
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddSingleton<DbSeeder>();
+
+            var config = new AutoMapper.MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile(new AutoMapperProfileConfiguration());
+            });
+
+            IMapper mapper = config.CreateMapper();
+            services.AddSingleton(mapper);
 
             // Add framework services.
             services.AddMvc();

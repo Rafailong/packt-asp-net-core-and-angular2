@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 
 using packt_asp_net_core_and_angular2.ViewModels;
 using Newtonsoft.Json;
+using packt_asp_net_core_and_angular2.Data;
+using AutoMapper;
 
 namespace packt_asp_net_core_and_angular2.Controllers
 {
@@ -15,6 +17,16 @@ namespace packt_asp_net_core_and_angular2.Controllers
         private int DefaultNumberOfItems = 5;
 
         private int MaxNumberOfItems = 100;
+
+        private ApplicationDbContext _dbContext;
+
+        private IMapper _mapper;
+
+        public ItemsController(ApplicationDbContext context, IMapper mapper)
+        {
+            this._dbContext = context;
+            this._mapper = mapper;
+        }
 
         public JsonSerializerSettings DefaultJonSerializerSetting {
             get
@@ -37,10 +49,11 @@ namespace packt_asp_net_core_and_angular2.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            var item = GetSampleItem()
-                .Where(i => i.Id == id)
-                .FirstOrDefault();
-            return new JsonResult(item, DefaultJonSerializerSetting);
+            var item = this._dbContext.Items.Find(id);
+            if (item == null) return NotFound(new {
+                Error = $"Item ID {id} has not been found."
+            });
+            return new JsonResult(this._mapper.Map<ItemViewModel>(item), DefaultJonSerializerSetting);
         }
 
         // GET api/values
@@ -54,10 +67,10 @@ namespace packt_asp_net_core_and_angular2.Controllers
         public IActionResult GetLatest(int num)
         {
             num = num > MaxNumberOfItems ? DefaultNumberOfItems : num;
-            var arr = GetSampleItem(num)
+            var arr = this._dbContext.Items
                 .OrderByDescending(i => i.CreatedDate)
-                .Take(num);
-            return new JsonResult(arr, DefaultJonSerializerSetting);
+                .Take(num).ToArray();
+            return new JsonResult(arr.Select(this._mapper.Map<ItemViewModel>), DefaultJonSerializerSetting);
         }
 
         [HttpGet("GetMostViewed")]
@@ -70,9 +83,9 @@ namespace packt_asp_net_core_and_angular2.Controllers
         public IActionResult GetMostViewed(int n)
         {
             n = n > MaxNumberOfItems ? DefaultNumberOfItems : n;
-            var arr = GetSampleItem(n)
+            var arr = this._dbContext.Items
                 .OrderByDescending(i => i.ViewCount)
-                .Take(n);
+                .Take(n).ToArray().Select(this._mapper.Map<ItemViewModel>);
             return new JsonResult(arr, DefaultJonSerializerSetting);
         }
 
@@ -86,9 +99,9 @@ namespace packt_asp_net_core_and_angular2.Controllers
         public IActionResult GetRandom(int n)
         {
             n = n > MaxNumberOfItems ? DefaultNumberOfItems : n;
-            var arr = GetSampleItem(n)
+            var arr = this._dbContext.Items
                 .OrderBy(i => Guid.NewGuid())
-                .Take(n);
+                .Take(n).ToArray().Select(this._mapper.Map<ItemViewModel>);
             return new JsonResult(arr, DefaultJonSerializerSetting);
         }
 
