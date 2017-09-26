@@ -5,7 +5,7 @@ import { Item } from "./item";
 import { ItemService } from './item.service';
 
 @Component({
-  selector: "item-detail",
+  selector: "item-detail-edit",
   template: `
     <div *ngIf="item" class="item-details">
       <h2>{{item.Title}} - Detail View</h2>
@@ -45,7 +45,7 @@ import { ItemService } from './item.service';
     }
   `]
 })
-export class ItemDetailComponent implements OnInit {
+export class ItemDetailEditComponent implements OnInit {
   item: Item;
 
   constructor(

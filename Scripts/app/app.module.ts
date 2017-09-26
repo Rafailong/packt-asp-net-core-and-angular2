@@ -13,7 +13,8 @@ import { AboutComponent } from './about.component';
 import { LoginComponent } from './login.component';
 import { PageNotFoundComponent } from './page-not-found.component';
 import { ItemListComponent } from "./items.component";
-import { ItemDetailComponent } from "./item-detail.component";
+import { ItemDetailEditComponent } from "./item-detail-edit.component";
+import { ItemDetailViewComponent } from './item-detail-view.component';
 
 import { ItemService } from "./item.service";
 
@@ -34,7 +35,8 @@ import { ItemService } from "./item.service";
     LoginComponent,
     PageNotFoundComponent,
     ItemListComponent,
-    ItemDetailComponent
+    ItemDetailViewComponent,
+    ItemDetailEditComponent
   ],
 })
 export class AppModule { }
