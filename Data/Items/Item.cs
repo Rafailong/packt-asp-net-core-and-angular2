@@ -18,7 +18,6 @@ namespace packt_asp_net_core_and_angular2.Data.Items
     [Required]
     public string Title { get; set; }
 
-    [Required]
     public string Notes { get; set; }
 
     public string Description { get; set; }
