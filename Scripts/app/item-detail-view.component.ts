@@ -7,23 +7,58 @@ import { ItemService } from './item.service';
 @Component({
   selector: "item-detail-view",
   template: `
-    <div *ngIf="item" class="item-details">
-      <h2>{{item.Title}}</h2>
-      <p>{{item.Description}}</p>
+    <div *ngIf="item" class="item-container">
+      <div class="item-tab-menu">
+        <span (click)="onItemDetailEdit(item)">Edit</span>
+        <span class="selected">View</span>
+      </div>
+      <div class="item-details">
+        <div class="mode">Display Mode</div>
+        <h2>{{item.Title}}</h2>
+        <p>{{item.Description}}</p>
+      </div>
     </div>
   `,
   styles: [`
-    .item-details {
-      margin: 5px;
-      padding: 5px 10px;
-      border: 1px solid black;
+    .item-container {
+      width: 600px;
+    }
+    .item-tab-menu {
+      margin-right: 30px;
+    }
+    .item-tab-menu span {
       background-color: #dddddd;
-      width: 300px;
+      border: 1px solid #666666;
+      border-bottom: 0;
+      cursor: pointer;
+      display: block;
+      float: right;
+      margin: 0 0 -1px 5px;
+      padding: 5px 10px 4px 10px;
+      text-align: center;
+      width: 60px;
+    }
+    .item-tab-menu span.selected {
+      background-color: #eeeeee;
+      cursor: auto;
+      font-weight: bold;
+      padding-bottom: 5px;
+    }
+    .item-details {
+      background-color: #eeeeee;
+      border: 1px solid black;
+      clear: both;
+      margin: 0;
+      padding: 5px 10px;
     }
     .item-details * {
       vertical-align: middle;
     }
-    .item-details ui li {
+    .item-details .mode {
+      font-size: 0.8em;
+      color: #777777;
+    }
+    .item-details ul li {
       padding: 5px 0;
     }
   `]
@@ -48,5 +83,9 @@ export class ItemDetailViewComponent implements OnInit {
     } else {
       this.router.navigate(['']);
     }
+  }
+
+  onItemDetailEdit(item: Item) {
+    this.router.navigate(['item/edit', item.Id]);
   }
 }
