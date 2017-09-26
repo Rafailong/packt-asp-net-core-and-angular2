@@ -14,6 +14,7 @@ namespace packt_asp_net_core_and_angular2
     : base(profileName)
     {
         CreateMap<Item, ItemViewModel>();
+        CreateMap<ItemViewModel, Item>();
     }
   }
 }
