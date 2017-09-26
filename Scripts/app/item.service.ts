@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
-import { Http, Response } from "@angular/http";
+import { Http, Response, Headers, RequestOptions } from "@angular/http";
 import { Observable } from "rxjs/Observable";
+import 'rxjs/add/operator/map';
 import { Item } from "./item";
 
 @Injectable()
@@ -51,6 +52,34 @@ export class ItemService {
       .toPromise()
       .then(response => response.json() as Item)
       .catch(this.handleError);
+  }
+
+  add(item: Item) {
+    var url = this.baseUrl;
+    return this.http.post(url, JSON.stringify(item), this.getRequestOptions())
+      .map(r => r.json())
+      .catch(this.handleError);
+  }
+
+  update(item: Item) {
+    var url = this.baseUrl + item.Id;
+    return this.http.put(url, JSON.stringify(item), this.getRequestOptions())
+      .map(r => r.json())
+      .catch(this.handleError);
+  }
+
+  delete(itemId: number) {
+    var url = this.baseUrl + itemId;
+    return this.http.delete(url)
+      .catch(this.handleError);
+  }
+
+  private getRequestOptions() {
+    return new RequestOptions({
+      headers: new Headers({
+        "Content-Type": "application/json"
+      })
+    });
   }
 
   private handleError(error: any): Promise<any> {

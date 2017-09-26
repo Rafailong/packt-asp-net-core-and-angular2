@@ -19,6 +19,14 @@ import { ItemService } from './item.service';
           </textarea>
         </li>
       </ul>
+      <div *ngIf="item.Id <= 0">
+        <input type="button" value="Save" (click)="onInsert(item)" />
+        <input type="button" value="Cancel" (click)="onBack()" />
+      </div>
+      <div *ngIf="item.Id != 0" class="commands update">
+        <input type="button" value="Update" (click)="onUpdate(item)" />
+        <input type="button" value="Delete" (click)="onDelete(item)" />
+        <input type="button" value="Back" (click)="onBack()" />
     </div>
   `,
   styles: [`
@@ -47,12 +55,52 @@ export class ItemDetailComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    var id = this.activatedRoute.snapshot.params['id'];
-    if (id) {
+    var id = Number.parseInt(this.activatedRoute.snapshot.params['id']);
+    if (id > 0) {
       this.itemService.get(id)
         .then(item => this.item = item);
+    } else if (id === 0) {
+      console.log("adding a new item...");
+      this.item = new Item(0, 'New Item', null);
     } else {
       this.router.navigate(['']);
     }
+  }
+
+  onInsert(item: Item) {
+    this.itemService.add(item).subscribe(
+      (data) => {
+        this.item = data;
+        console.log('item added!');
+        this.router.navigate(['']);
+      },
+      (err) => console.error(err)
+    )
+  }
+
+  onBack() {
+    this.router.navigate(['']);
+  }
+
+  onUpdate(item: Item) {
+    this.itemService.update(item).subscribe(
+      (data) => {
+        this.item = data;
+        console.log('item updated!');
+        this.router.navigate(['']);
+      },
+      (err) => console.error(err)
+    )
+  }
+
+  onDelete(item: Item){
+    this.itemService.delete(item.Id).subscribe(
+      (data) => {
+        this.item = data;
+        console.log('item deleted!');
+        this.router.navigate(['']);
+      },
+      (err) => console.error(err)
+    )
   }
 }
