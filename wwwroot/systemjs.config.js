@@ -3,7 +3,8 @@
   var map = { 
     'app': 'app', // our application files 
     '@angular': 'js/@angular', // angular2 packages 
-    'rxjs': 'js/rxjs' // Rxjs package 
+    'rxjs': 'js/rxjs', // Rxjs package 
+    'ngx-bootstrap': 'js/ngx-bootstrap'
   };
 
   // packages tells the system loader wich filename and/or extention
@@ -16,6 +17,9 @@
     'rxjs': {
       defaultExtention: 'js'
     },
+    'ngx-bootstrap': {
+      defaultExtention: 'js'
+    }
   };
 
   // configure @angular packages
