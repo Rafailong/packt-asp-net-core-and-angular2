@@ -1,4 +1,5 @@
 import { Component } from "@angular/core";
+import { Router } from '@angular/router';
 
 import { AlertModule, BsDropdownModule } from 'ngx-bootstrap';
 
@@ -22,10 +23,18 @@ import { AlertModule, BsDropdownModule } from 'ngx-bootstrap';
       </div>
       <div class="collapse navbar-collapse" id="navbar">
         <ul class="nav navbar-nav">
-          <li><a class="home" [routerLink]="['']">Home</a></li>
-          <li><a class="about" [routerLink]="['about']">About</a></li>
-          <li><a class="login" [routerLink]="['login']">Login</a></li>
-          <li><a class="add" [routerLink]="['item/edit', 0]">Add New</a></li>
+          <li [class.active]="isActive([''])">
+            <a class="home" [routerLink]="['']">Home</a>
+          </li>
+          <li [class.active]="isActive(['about'])">
+            <a class="about" [routerLink]="['about']">About</a>
+          </li>
+          <li [class.active]="isActive(['login'])">
+            <a class="login" [routerLink]="['login']">Login</a>
+          </li>
+          <li [class.active]="isActive(['item/edit', 0])">
+            <a class="add" [routerLink]="['item/edit', 0]">Add New</a>
+          </li>
         </ul>
       </div>
     </div>
@@ -36,4 +45,11 @@ import { AlertModule, BsDropdownModule } from 'ngx-bootstrap';
   </div>
   `
 })
-export class AppComponent { }
+export class AppComponent {
+  constructor(private router: Router) { }
+
+  isActive(data: any[]) {
+    const urlTree =this.router.createUrlTree(data);
+    return this.router.isActive(urlTree, true);
+  }
+}
