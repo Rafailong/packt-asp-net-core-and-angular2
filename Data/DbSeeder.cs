@@ -12,13 +12,23 @@ namespace packt_asp_net_core_and_angular2.Data
   using packt_asp_net_core_and_angular2.Data.Comments;
   using packt_asp_net_core_and_angular2.Data.Users;
 
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+
   public class DbSeeder
   {
     private ApplicationDbContext DbContext;
+    private RoleManager<IdentityRole> RoleManager;
+    private UserManager<ApplicationUser> UserManager;
 
-    public DbSeeder(ApplicationDbContext context)
+    public DbSeeder(
+      ApplicationDbContext dbContext,
+      RoleManager<IdentityRole> roleManager,
+      UserManager<ApplicationUser> userManager)
     {
-      this.DbContext = context;
+      DbContext = dbContext;
+      RoleManager = roleManager;
+      UserManager = userManager;
     }
 
     public async Task SeedAsync()
@@ -26,7 +36,7 @@ namespace packt_asp_net_core_and_angular2.Data
       this.DbContext.Database.EnsureCreated();
       if (await this.DbContext.Users.CountAsync() == 0)
       {
-        this.CreateUsers();
+        await this.CreateUsers();
       }
 
       if (await this.DbContext.Items.CountAsync() == 0)
@@ -164,12 +174,30 @@ namespace packt_asp_net_core_and_angular2.Data
         }; 
     }
 
-    private void CreateUsers()
+    private async Task CreateUsers()
     {
       var createdDate = new DateTime(2016, 03, 01, 12, 30, 00);
       var lastModified = DateTime.Now;
+      var roleAdministrators = "Administrators";
+      var roleRegistered = "Registered";
 
-      void AddUser(string email, string name) {
+      //Create Roles (if they doesn't exist yet)
+      if (!await RoleManager.RoleExistsAsync(roleAdministrators)) await
+      RoleManager.CreateAsync(new IdentityRole(roleAdministrators));
+      if (!await RoleManager.RoleExistsAsync(roleRegistered)) await
+      RoleManager.CreateAsync(new IdentityRole(roleRegistered));
+
+      await AddUser(createdDate, lastModified, "admin@opengamelist.com", "Admin", "Pass4User", roleAdministrators);
+      await AddUser(createdDate, lastModified, "ryan@opengamelist.com", "Ryan", "Pass4User", roleRegistered);
+      await AddUser(createdDate, lastModified, "solis@opengamelist.com", "Solis", "Pass4User", roleRegistered);
+      await AddUser(createdDate, lastModified, "vodan@opengamelist.com", "Vodan", "Pass4User", roleRegistered);
+      this.DbContext.SaveChanges();
+    }
+
+    async Task AddUser(DateTime createdDate, DateTime lastModified,
+      string email, string name, string password, string role) {
+      if (await UserManager.FindByEmailAsync(email) == null)
+      {
         var user = new ApplicationUser(){
           Id = Guid.NewGuid().ToString(),
           UserName = name,
@@ -177,14 +205,12 @@ namespace packt_asp_net_core_and_angular2.Data
           CreatedDate = createdDate,
           LastModifiedDate = lastModified
         };
-        this.DbContext.Users.Add(user);
+        await UserManager.CreateAsync(user, password);
+        await UserManager.AddToRoleAsync(user, role);
+        // Remove Lockout and E-Mail confirmation.
+        user.EmailConfirmed = true;
+        user.LockoutEnabled = false;
       }
-
-      AddUser("admin@opengamelist.com", "Admin");
-      AddUser("ryan@opengamelist.com", "Ryan");
-      AddUser("solis@opengamelist.com", "Solis");
-      AddUser("vodan@opengamelist.com", "Vodan");
-      this.DbContext.SaveChanges();
     }
   }
 }

@@ -7,7 +7,7 @@ namespace packt_asp_net_core_and_angular2.Data
   using Data.Comments;
   using Data.Users;
 
-  public class ApplicationDbContext : DbContext
+  public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
   {
       public ApplicationDbContext(DbContextOptions options) : base(options)
       {
@@ -57,7 +57,5 @@ namespace packt_asp_net_core_and_angular2.Data
       public DbSet<Item> Items { get; set; }
 
       public DbSet<Comment> Comments { get; set; }
-
-      public DbSet<ApplicationUser> Users { get; set; }
   }
 }

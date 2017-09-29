@@ -9,22 +9,13 @@ namespace packt_asp_net_core_and_angular2.Data.Users
   using System.Text;
   using System.Threading.Tasks;
 
-  public class ApplicationUser
+  using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+
+  public class ApplicationUser : IdentityUser
   {
     public ApplicationUser()
     {
     }
-
-    [Key]
-    [Required]
-    public string Id { get; set; }
-
-    [Required]
-    [MaxLength(128)]
-    public string UserName { get; set; }
-
-    [Required]
-    public string Email { get; set; }
 
     public string DisplayName { get; set; }
 

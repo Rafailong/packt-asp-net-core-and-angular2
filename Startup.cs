@@ -13,6 +13,9 @@ using packt_asp_net_core_and_angular2.Data;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 
+using packt_asp_net_core_and_angular2.Data.Users;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+
 namespace packt_asp_net_core_and_angular2
 {
     public class Startup
@@ -34,6 +37,15 @@ namespace packt_asp_net_core_and_angular2
         {
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+            services.AddIdentity<ApplicationUser, IdentityRole>(conf => {
+                conf.User.RequireUniqueEmail = true;
+                conf.Password.RequireNonAlphanumeric = false;
+                conf.Cookies.ApplicationCookie.AutomaticChallenge = false;
+            })
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultTokenProviders();
+
             services.AddSingleton<DbSeeder>();
 
             var config = new AutoMapper.MapperConfiguration(cfg =>
