@@ -8,13 +8,16 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Rewrite;
-using packt_asp_net_core_and_angular2.Data;
-
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
+
 using AutoMapper;
 
+using packt_asp_net_core_and_angular2.Data;
+using packt_asp_net_core_and_angular2.Classes;
 using packt_asp_net_core_and_angular2.Data.Users;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace packt_asp_net_core_and_angular2
 {
@@ -78,6 +81,24 @@ namespace packt_asp_net_core_and_angular2
                     context.Context.Response.Headers["Cache-Control"] = Configuration["StaticFiles:Headers:Cache-Control"];
                     context.Context.Response.Headers["Pragma"] = Configuration["StaticFiles:Headers:Pragma"];
                     context.Context.Response.Headers["Expires"]= Configuration["StaticFiles:Headers:Expires"];
+                }
+            });
+
+            // Add a custom Jwt Provider to generate Tokens
+            app.UseJwtProvider();
+            // Add the Jwt Bearer Header Authentication to validate Tokens
+            app.UseJwtBearerAuthentication(new JwtBearerOptions()
+            {
+                AutomaticAuthenticate = true,
+                AutomaticChallenge = true,
+                RequireHttpsMetadata = false,
+                TokenValidationParameters = new TokenValidationParameters()
+                {
+                    IssuerSigningKey = JwtTokenProvider.SecurityKey,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = JwtTokenProvider.Issuer,
+                    ValidateIssuer = false,
+                    ValidateAudience = false
                 }
             });
 

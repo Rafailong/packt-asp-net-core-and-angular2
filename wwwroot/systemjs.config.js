@@ -18,6 +18,7 @@
       defaultExtention: 'js'
     },
     'ngx-bootstrap': {
+      format: 'cjs', main: 'bundles/ngx-bootstrap.umd.js',
       defaultExtention: 'js'
     }
   };

@@ -1,10 +1,12 @@
 import { NgModule } from "@angular/core";
 import { BrowserModule } from "@angular/platform-browser";
-import { FormsModule }   from '@angular/forms';
+import { FormsModule, ReactiveFormsModule }   from '@angular/forms';
 import { HttpModule }    from '@angular/http';
 import { RouterModule } from "@angular/router";
 
 import "rxjs/Rx";
+
+import { BsRootModule } from 'ngx-bootstrap';
 
 import { AppRouting } from './app.routing';
 import { AppComponent } from "./app.component";
@@ -23,8 +25,10 @@ import { ItemService } from "./item.service";
     BrowserModule,
     HttpModule,
     FormsModule,
+    ReactiveFormsModule,
     RouterModule,
-    AppRouting
+    AppRouting,
+    BsRootModule
   ],
   providers: [ ItemService ],
   bootstrap: [ AppComponent ],
