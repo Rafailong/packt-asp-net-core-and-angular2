@@ -200,3 +200,13 @@ item-list {
     }
   }
 }
+
+.ng-valid[required], .ng-valid.required  {
+  border-bottom: 3px solid #42A948; /* green */
+}
+
+.ng-invalid:not(form) {
+  &.ng-dirty, &.ng-touched {
+    border-bottom: 3px solid #a94442; /* red */
+  }
+}

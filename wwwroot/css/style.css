@@ -177,3 +177,13 @@ item-list ul li .description {
 .login-container .form-login input {
   margin-bottom: 10px;
 }
+.ng-valid[required],
+.ng-valid.required {
+  border-bottom: 3px solid #42A948;
+  /* green */
+}
+.ng-invalid:not(form).ng-dirty,
+.ng-invalid:not(form).ng-touched {
+  border-bottom: 3px solid #a94442;
+  /* red */
+}
