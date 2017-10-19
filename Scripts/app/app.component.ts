@@ -3,6 +3,8 @@ import { Router } from '@angular/router';
 
 import { AlertModule, BsDropdownModule } from 'ngx-bootstrap';
 
+import { AuthService } from "./auth.service";
+
 @Component({
   selector: "opengamelist",
   template: `
@@ -29,12 +31,19 @@ import { AlertModule, BsDropdownModule } from 'ngx-bootstrap';
           <li [class.active]="isActive(['about'])">
             <a class="about" [routerLink]="['about']">About</a>
           </li>
-          <li [class.active]="isActive(['login'])">
+
+          <li *ngIf="!authService.isLoggedIn()" [class.active]="isActive(['login'])">
             <a class="login" [routerLink]="['login']">Login</a>
           </li>
-          <li [class.active]="isActive(['item/edit', 0])">
+
+          <li *ngIf="authService.isLoggedIn()">
+            <a class="logout" href="javascript:void(0)" (click)="logout()">Logout</a>
+          </li>
+
+          <li *ngIf="authService.isLoggedIn()" [class.active]="isActive(['item/edit', 0])">
             <a class="add" [routerLink]="['item/edit', 0]">Add New</a>
           </li>
+
         </ul>
       </div>
     </div>
@@ -46,10 +55,21 @@ import { AlertModule, BsDropdownModule } from 'ngx-bootstrap';
   `
 })
 export class AppComponent {
-  constructor(private router: Router) { }
+  constructor(
+    private router: Router,
+    public authService: AuthService
+  ) { }
 
   isActive(data: any[]) {
-    const urlTree =this.router.createUrlTree(data);
+    const urlTree = this.router.createUrlTree(data);
     return this.router.isActive(urlTree, true);
+  }
+
+  logout(): boolean {
+    // logs out the user, then redirects him to Welcome View.
+    if (!this.authService.logout()) {
+      this.router.navigate([""]);
+    }
+    return false;
   }
 }

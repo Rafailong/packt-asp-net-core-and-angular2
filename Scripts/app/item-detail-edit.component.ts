@@ -4,6 +4,8 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Item } from "./item";
 import { ItemService } from './item.service';
 
+import { AuthService } from "./auth.service";
+
 @Component({
   selector: "item-detail-edit",
   template: `
@@ -13,8 +15,8 @@ import { ItemService } from './item.service';
     </h2>
     <div class="item-container">
       <ul class="nav nav-tabs">
-        <li role="presentation" class="active">
-          <a href="#">Edit</a>
+        <li *ngIf="authService.isLoggedIn()" role="presentation" class="active">
+          <a href="javascript:void(0)" (click)="onUpdate(item)">Edit</a>
         </li>
         <li role="presentation" *ngIf="item.Id != 0">
           <a href="#" (click)="onItemDetailView(item)">View</a>
@@ -66,11 +68,16 @@ export class ItemDetailEditComponent implements OnInit {
 
   constructor(
     private router: Router,
+    public authService: AuthService,
     private itemService: ItemService,
     private activatedRoute: ActivatedRoute
   ) {}
 
   ngOnInit() {
+    if (!this.authService.isLoggedIn()) {
+      this.router.navigate([""]);
+    }
+
     var id = Number.parseInt(this.activatedRoute.snapshot.params['id']);
     if (id > 0) {
       this.itemService.get(id)

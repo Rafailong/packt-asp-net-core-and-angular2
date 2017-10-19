@@ -10,6 +10,9 @@ using packt_asp_net_core_and_angular2.Data;
 using AutoMapper;
 using packt_asp_net_core_and_angular2.Data.Items;
 
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+
 namespace packt_asp_net_core_and_angular2.Controllers
 {
     [Route("api/[controller]")]
@@ -107,6 +110,7 @@ namespace packt_asp_net_core_and_angular2.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public IActionResult Add([FromBody] ItemViewModel model)
         {
             if (!ModelState.IsValid || model == null)
@@ -118,7 +122,7 @@ namespace packt_asp_net_core_and_angular2.Controllers
             item.CreatedDate =
             item.LastModifiedDate = DateTime.Now;
 
-            item.UserId = this._dbContext.Users.First(u => u.UserName == "Admin").Id;
+            item.UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             this._dbContext.Items.Add(item);
             this._dbContext.SaveChanges();
 
@@ -126,6 +130,7 @@ namespace packt_asp_net_core_and_angular2.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize]
         public IActionResult Edit(int id, [FromBody] ItemViewModel model)
         {
             if (!ModelState.IsValid || model == null)
@@ -154,6 +159,7 @@ namespace packt_asp_net_core_and_angular2.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public IActionResult Delete(int id)
         {
             var item = this._dbContext.Items.Find(id);

@@ -1,6 +1,8 @@
-import {Component} from '@angular/core';
-import {FormBuilder, FormGroup, FormControl, Validators} from "@angular/forms";
-import {Router} from "@angular/router";
+import { Component } from '@angular/core';
+import { FormBuilder, FormGroup, FormControl, Validators } from "@angular/forms";
+import { Router } from "@angular/router";
+
+import { AuthService } from "./auth.service";
 
 @Component({
   selector: 'login',
@@ -43,9 +45,17 @@ export class LoginComponent {
   username: FormControl;
   password: FormControl;
 
-  loginError: any = null;
+  loginError: any = false;
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private router: Router,
+    private fb: FormBuilder,
+    private authService: AuthService
+  ) {
+    if (this.authService.isLoggedIn()) {
+      this.router.navigate([""]);
+    }
+
     this.username = new FormControl('', Validators.required);
     this.password = new FormControl('', Validators.required);
     this.loginForm = fb.group({
@@ -55,6 +65,19 @@ export class LoginComponent {
   }
   performLogin(e: any) {
     e.preventDefault();
-    alert(JSON.stringify(this.loginForm.value));
+    const username = this.loginForm.value.username;
+    const password = this.loginForm.value.password;
+    this.authService.login(username, password).subscribe((data: any) => {
+      // login successful
+      this.loginError = false;
+      var auth = this.authService.getAuth();
+      alert("Our Token is: " + auth.access_token);
+      this.router.navigate([""]);
+    },
+    (err: any) => {
+      console.log(err);
+      // login failure
+      this.loginError = true;
+    });
   }
 }

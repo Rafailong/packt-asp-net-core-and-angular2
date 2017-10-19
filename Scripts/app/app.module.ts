@@ -9,6 +9,8 @@ import "rxjs/Rx";
 import { BsRootModule } from 'ngx-bootstrap';
 
 import { AppRouting } from './app.routing';
+import { AuthHttp } from "./auth.http";
+import { AuthService } from "./auth.service";
 import { AppComponent } from "./app.component";
 import { HomeComponent } from './home.component';
 import { AboutComponent } from './about.component';
@@ -30,7 +32,7 @@ import { ItemService } from "./item.service";
     AppRouting,
     BsRootModule
   ],
-  providers: [ ItemService ],
+  providers: [ AuthHttp, AuthService, ItemService ],
   bootstrap: [ AppComponent ],
   declarations: [ 
     AppComponent,
