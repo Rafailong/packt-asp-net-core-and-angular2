@@ -14,18 +14,26 @@ namespace packt_asp_net_core_and_angular2.Data
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+  using Microsoft.Extensions.DependencyInjection;
+  using OpenIddict.Core;
+  using System.Threading;
+  using OpenIddict.Models;
+  using CryptoHelper;
 
   public class DbSeeder
   {
+    private IServiceProvider Services;
     private ApplicationDbContext DbContext;
     private RoleManager<IdentityRole> RoleManager;
     private UserManager<ApplicationUser> UserManager;
 
     public DbSeeder(
+      IServiceProvider services,
       ApplicationDbContext dbContext,
       RoleManager<IdentityRole> roleManager,
       UserManager<ApplicationUser> userManager)
     {
+      Services = services;
       DbContext = dbContext;
       RoleManager = roleManager;
       UserManager = userManager;
@@ -39,11 +47,39 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
         await this.CreateUsers();
       }
 
+      // Create default Application
+      await CreateApplication();
+
       if (await this.DbContext.Items.CountAsync() == 0)
       {
         this.CreateItems();
       }
     }
+
+    private async Task CreateApplication()
+    {
+        using (var scope = Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
+        {
+          var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+          await context.Database.EnsureCreatedAsync();
+
+          var manager = scope.ServiceProvider.GetRequiredService<OpenIddictApplicationManager<OpenIddictApplication>>();
+
+          if (await manager.FindByClientIdAsync("aurelia", CancellationToken.None) == null)
+          {
+              var descriptor = new OpenIddictApplicationDescriptor
+              {
+                  ClientId = "OpenGameList",
+                  DisplayName = "OpenGameList",
+                  PostLogoutRedirectUris = { new Uri("http://localhost:5000/") },
+                  RedirectUris = { new Uri("http://localhost:5000/api/connect/token") },
+                  ClientSecret = Crypto.HashPassword("1234567890_my_client_secret")
+              };
+
+              await manager.CreateAsync(descriptor, CancellationToken.None);
+          }
+      }
+  }
 
     private void CreateItems()
     {
